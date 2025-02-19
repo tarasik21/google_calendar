@@ -1,16 +1,20 @@
 import shmoment from './shmoment.js';
 
 // вернет дату понедельника той недели, в которую входит переданный день
-export const getStartOfWeek = (date) => {
+export const getStartOfWeek = (date = new Date()) => {
+  if (!date || !(date instanceof Date)) {
+    console.error("Ошибка: `getStartOfWeek()` получил некорректную дату", date);
+    return new Date(); // Возвращаем текущую дату, чтобы избежать ошибки
+  }
+
   const dateCopy = new Date(date);
   const dayOfWeek = dateCopy.getDay();
-  const difference =
-    dayOfWeek === 0
-      ? -6 // for Sunday
-      : 1 - dayOfWeek;
-  const monday = new Date(dateCopy.setDate(date.getDate() + difference));
+  const difference = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = new Date(dateCopy.setDate(dateCopy.getDate() + difference));
+
   return new Date(monday.getFullYear(), monday.getMonth(), monday.getDate());
 };
+
 
 // вернет массив из 7 дней, начиная и переданной даты
 export const generateWeekRange = (startDate) => {
