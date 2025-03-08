@@ -1,23 +1,42 @@
-
 const modalElem = document.querySelector('.modal');
 const modalContentElem = document.querySelector('.modal__content');
 
-// Функция для открытия модального окна
-export function openModal() {
-  modalElem.classList.add('modal_open');
-}
+// Функция для создания и отображения модального окна
+// modal.js
 
-// Функция для закрытия модального окна
-export function closeModal() {
-  modalElem.classList.remove('modal_open');
-}
+export const openModal = () => {
+  const modalElem = document.createElement('div');
+  modalElem.classList.add('modal');
 
-// Закрытие при клике на фон
-modalElem.addEventListener('click', event => {
-  if (!modalContentElem.contains(event.target)) {
-    closeModal();
-  }
-});
+  const modalContentElem = document.createElement('div');
+  modalContentElem.classList.add('modal__content');
+  
+  const closeButton = document.createElement('button');
+  closeButton.classList.add('close-btn');
+  closeButton.innerText = 'Закрыть';
+
+  const header = document.createElement('h2');
+  header.innerText = 'Это модальное окно';
+  const paragraph = document.createElement('p');
+  paragraph.innerText = 'Здесь может быть какой-то контент...';
+
+  modalContentElem.appendChild(closeButton);
+  modalContentElem.appendChild(header);
+  modalContentElem.appendChild(paragraph);
+  modalElem.appendChild(modalContentElem);
+  
+  document.body.appendChild(modalElem);
+  
+  modalElem.style.display = 'flex';
+
+  closeButton.addEventListener('click', () => closeModal(modalElem));
+};
+
+export const closeModal = (modalElem) => {
+  modalElem.style.display = 'none';
+  modalElem.remove();
+};
+
 
 // опишите ф-ции openModal и closeModal
 // модальное окно работает похожим на попап образом

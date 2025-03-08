@@ -8,15 +8,13 @@ let storage = {
   // это все данные, которые вам нужно хранить для работы приложения
 };
 
-export const getItem = (key) => {
-  const data = localStorage.getItem(key);
-  return data ? new Date(data) : null; // Преобразуем строку в Date, если она есть
-};
-
 export const setItem = (key, value) => {
-  localStorage.setItem(key, value.toISOString()); // Сохраняем дату в формате ISO
+  // ф-ция должна устанавливать значения в объект storage
 };
 
+export const getItem = (key) => {
+  // ф-ция должна возвращать по ключу значения из объекта storage
+};
 
 // пример объекта события
 const eventExample = {

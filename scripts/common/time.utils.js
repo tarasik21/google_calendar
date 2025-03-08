@@ -1,22 +1,33 @@
 import shmoment from './shmoment.js';
 
 // вернет дату понедельника той недели, в которую входит переданный день
-export const getStartOfWeek = (date = new Date()) => {
-  if (!date || !(date instanceof Date)) {
-    console.error("Ошибка: `getStartOfWeek()` получил некорректную дату", date);
-    return new Date(); // Возвращаем текущую дату, чтобы избежать ошибки
-  }
-
-  const dateCopy = new Date(date);
-  const dayOfWeek = dateCopy.getDay();
-  const difference = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  const monday = new Date(dateCopy.setDate(dateCopy.getDate() + difference));
-
-  return new Date(monday.getFullYear(), monday.getMonth(), monday.getDate());
+// Функція для отримання дати початку тижня (Понеділок)
+// Функція для отримання дати початку тижня (Понеділок)
+const getStartOfWeek = (date) => {
+  const day = date.getDay();
+  const diff = (day === 0 ? 6 : day - 1); // Якщо неділя (0), то ми йдемо назад на 6 днів
+  const startOfWeek = new Date(date);
+  startOfWeek.setDate(date.getDate() - diff);
+  startOfWeek.setHours(0, 0, 0, 0); // Налаштуємо час на початок дня (00:00)
+  return startOfWeek;
 };
+
+// Генерація днів тижня для поточної дати з початком з понеділка
+const weekStartDate = getStartOfWeek(new Date()); // перейменував startDate на weekStartDate
+const weekDays = generateWeekRange(weekStartDate);
+
+console.log('Генерація днів тижня:', weekDays);
 
 
 // вернет массив из 7 дней, начиная и переданной даты
+if (typeof weekDays === 'undefined') {
+  const weekStartDate = getStartOfWeek(new Date()); // отримуємо дату початку тижня
+  weekDays = generateWeekRange(weekStartDate); // генеруємо дні тижня
+}
+
+console.log('Генерація днів тижня:', weekDays);
+
+// Ваш основний код
 export const generateWeekRange = (startDate) => {
   const result = [];
   for (let i = 0; i < 7; i += 1) {
@@ -25,6 +36,13 @@ export const generateWeekRange = (startDate) => {
   }
   return result;
 };
+
+// Генеруємо дні тижня для поточної дати
+const startDate = new Date();  // Ти можеш замінити на будь-яку дату
+const weekDays = generateWeekRange(startDate);
+
+console.log('Генерація днів тижня:', weekDays);  // Тепер weekDays визначена
+
 
 // вернет объект даты по переданной дате '2000-01-01' и времени '21:00'
 export const getDateTime = (date, time) => {

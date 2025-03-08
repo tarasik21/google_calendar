@@ -5,53 +5,36 @@ import { openModal } from '../common/modal.js';
 const daysOfWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
 export const renderHeader = () => {
-  const displayedWeekStart = localStorage.getItem('displayedWeekStart'); 
-
-  if (!displayedWeekStart) {
-    console.error('No "displayedWeekStart" found in localStorage');
-    return;
-  }
-
-
+  // 1. Получаем дату начала недели из localStorage
+  const displayedWeekStart = getItem('displayedWeekStart');
   const startDate = new Date(displayedWeekStart);
-  if (isNaN(startDate)) {
-    console.error('Invalid "displayedWeekStart" date in localStorage');
-    return;
-  }
 
+  // 2. Генерируем массив из 7 дней недели
+  const weekDates = generateWeekRange(startDate);
 
-  const weekDays = generateWeekRange(startDate);
+  // 3. Создаем HTML-разметку для заголовка (7 дней недели)
+  const weekHTML = weekDates.map((date) => {
+    const dayOfWeek = daysOfWeek[date.getDay()]; // Получаем день недели
+    const dayNumber = date.getDate(); // Получаем число месяца
 
+    return `
+      <div class="calendar__day-label" data-day="${dayNumber}">
+        <span class="calendar__day-week">${dayOfWeek}</span>
+        <span class="calendar__day-number">${dayNumber}</span>
+      </div>
+    `;
+  }).join('');
 
-  const headerHTML = weekDays.map(day => {
-    const dayOfWeek = day.toLocaleString('en-US', { weekday: 'long' }); 
-    const dayOfMonth = day.getDate();  
-    const dataHour = 9;  
+  // 4. Вставляем разметку в .calendar__header
+  document.querySelector('.calendar__header').innerHTML = weekHTML;
 
-    return `<div class="calendar__day" data-hour="${dataHour}">
-              <span class="calendar__day-name">${dayOfWeek}</span>
-              <span class="calendar__day-number">${dayOfMonth}</span>
-            </div>`;
-  }).join('');  
-
-
-  const calendarHeader = document.querySelector('.calendar__header');
-  if (calendarHeader) {
-    calendarHeader.innerHTML = headerHTML;
-  }
+  // 5. Добавляем обработчик клика на кнопку "Create"
+  document
+    .querySelector('.create-event-btn')
+    .addEventListener('click', openModal);
 };
 
-
-const createButton = document.querySelector('.create-event-btn');
-if (createButton) {
-  createButton.addEventListener('click', () => {
-    openModal(); 
-  });
-}
-
-
-
-
+  
 
   // на основе displayedWeekStart из storage с помощью generateWeekRange сформируйте массив дней текущей недели
   // на основе полученного массива сформируйте разметку в виде строки - 7 дней (день недели и число в месяце)
