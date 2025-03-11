@@ -2,12 +2,18 @@ import { getItem } from '../common/storage.js';
 import { generateWeekRange } from '../common/time.utils.js';
 import { openModal } from '../common/modal.js';
 
-const daysOfWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+export const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
 
 export const renderHeader = () => {
   // 1. Получаем дату начала недели из localStorage
-  const displayedWeekStart = getItem('displayedWeekStart');
+  const displayedWeekStart = getItem('displayedWeekStart') || getStartOfWeek(new Date());
   const startDate = new Date(displayedWeekStart);
+  if (isNaN(startDate)) {
+    console.error('Invalid startDate, using fallback.');
+    startDate = getStartOfWeek(new Date());
+  }
+  
 
   // 2. Генерируем массив из 7 дней недели
   const weekDates = generateWeekRange(startDate);

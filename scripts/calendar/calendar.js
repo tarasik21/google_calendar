@@ -2,13 +2,17 @@
  import { generateWeekRange } from '../common/time.utils.js';
  import { renderEvents } from '../events/events.js';
  import { createNumbersArray } from '../common/createNumbersArray.js';
- import { getStartOfWeek } from '../common/time.utils.js';
+ import { daysOfWeek } from '../calendar/header.js';  // Убедитесь, что путь правильный
+ import { getStartOfWeek } from '/scripts/common/time.utils.js';
 
 
- export const generateDay = () => {
-  console.log('Виклик generateDay()');
-  let dayHTML = ''; 
 
+
+
+
+// Функция для генерации разметки одного дня
+export const generateDay = () => {
+  let dayHTML = '';
   for (let hour = 0; hour < 24; hour++) {
     const hourFormatted = hour.toString().padStart(2, '0') + ':00';
     dayHTML += `
@@ -18,43 +22,61 @@
       </div>
     `;
   }
-
   return dayHTML;
 };
 
+// Функция для рендеринга недели
+export const renderWeek = () => {
+  const weekStartDate = getStartOfWeek(new Date());
 
+  // Получаем дни недели
+  const weekDays = generateWeekRange(weekStartDate);
 
+  let weekHTML = '';
 
+  // Заголовок с днями недели
+  weekHTML += `
+    <thead>
+      <tr>
+        <th></th> <!-- Пустой заголовок для времени -->
+        ${weekDays.map(date => {
+          const dayOfWeek = daysOfWeek[date.getDay()]; // День недели
+          return `<th>${dayOfWeek}</th>`;
+        }).join('')}
+      </tr>
+    </thead>
+  `;
 
+  // Тело таблицы с временными блоками
+  weekHTML += '<tbody>';
+  for (let hour = 0; hour < 24; hour++) {
+    const hourFormatted = `${hour.toString().padStart(2, '0')}:00`;
+    weekHTML += `
+      <tr>
+        <td>${hourFormatted}</td> <!-- Время -->
+        ${weekDays.map(date => {
+          const dayNumber = date.getDate();
+          // Если хотите вставить сюда временные слоты, можно вызвать generateDay()
+          return `<td class="calendar__time-slot" data-hour="${hour}" data-day="${dayNumber}"></td>`;
+        }).join('')}
+      </tr>
+    `;
+  }
+  weekHTML += '</tbody>';
 
-  // функция должна сгенерировать и вернуть разметку дня в виде строки
-  // разметка состоит из 24 часовых временных слотов (.calendar__time-slot)
-
-
-
-
-  export function renderWeek() {
-    const weekStartDate = getStartOfWeek(new Date());
-    
-    // Оголошуємо та присвоюємо значення weekDays тільки всередині цієї функції
-    const weekDays = generateWeekRange(weekStartDate);
-  
-    // Подальша робота з weekDays
-    weekDays.forEach((date) => {
-      const dayNumber = date.getDate();
-      console.log(`Рендерим день ${dayNumber} (${date.toDateString()})`);
-      
-      weekHTML += `
-        <div class="calendar__day" data-day="${dayNumber}">
-          ${generateDay()}
-        </div>
-      `;
-    });
-    console.log('Сформированный HTML:', weekHTML);
-    
-    // Вставка сформованої розмітки
+  // Вставляем HTML в контейнер
+  const weekContainer = document.querySelector('.calendar__week');
+  if (weekContainer) {
     weekContainer.innerHTML = weekHTML;
   }
+
+  // После рендера недели рендерим события
+  renderEvents();
+};
+
+  
+  
+  
   
   
   
