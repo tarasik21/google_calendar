@@ -28,51 +28,52 @@ export const generateDay = () => {
 // Функция для рендеринга недели
 export const renderWeek = () => {
   const weekStartDate = getStartOfWeek(new Date());
-
-  // Получаем дни недели
   const weekDays = generateWeekRange(weekStartDate);
 
-  let weekHTML = '';
-
-  // Заголовок с днями недели
-  weekHTML += `
+  let weekHTML = `
     <thead>
       <tr>
-        <th></th> <!-- Пустой заголовок для времени -->
+        <th></th> <!-- Пустая ячейка для времени -->
         ${weekDays.map(date => {
-          const dayOfWeek = daysOfWeek[date.getDay()]; // День недели
-          return `<th>${dayOfWeek}</th>`;
+          const dayOfWeek = daysOfWeek[date.getDay()];
+          const dayNumber = date.getDate();
+          return `<th>${dayOfWeek} ${dayNumber}</th>`;
         }).join('')}
       </tr>
     </thead>
+    <tbody>
   `;
 
-  // Тело таблицы с временными блоками
-  weekHTML += '<tbody>';
   for (let hour = 0; hour < 24; hour++) {
     const hourFormatted = `${hour.toString().padStart(2, '0')}:00`;
     weekHTML += `
       <tr>
-        <td>${hourFormatted}</td> <!-- Время -->
+        <td>${hourFormatted}</td> 
         ${weekDays.map(date => {
-          const dayNumber = date.getDate();
-          // Если хотите вставить сюда временные слоты, можно вызвать generateDay()
-          return `<td class="calendar__time-slot" data-hour="${hour}" data-day="${dayNumber}"></td>`;
+          return `
+            <td class="calendar__time-slot" data-hour="${hour}" data-day="${date.getDate()}">
+              ${generateDay()}  <!-- Теперь каждый день получает 24 блока -->
+            </td>
+          `;
         }).join('')}
       </tr>
     `;
   }
+
   weekHTML += '</tbody>';
 
-  // Вставляем HTML в контейнер
   const weekContainer = document.querySelector('.calendar__week');
-  if (weekContainer) {
-    weekContainer.innerHTML = weekHTML;
+  if (!weekContainer) {
+    console.error("Элемент .calendar__week не найден!");
+    return;
   }
 
-  // После рендера недели рендерим события
-  renderEvents();
+  weekContainer.innerHTML = weekHTML;
+
+  console.log("Рендеринг недели выполнен!");
+  renderEvents(); // если у тебя есть функция рендеринга событий
 };
+
 
   
   
