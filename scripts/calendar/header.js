@@ -1,27 +1,25 @@
 import { getItem } from '../common/storage.js';
 import { generateWeekRange } from '../common/time.utils.js';
 import { openModal } from '../common/modal.js';
+import { getStartOfWeek } from '../common/time.utils.js';
+
 
 export const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-
 export const renderHeader = () => {
-  // 1. Получаем дату начала недели из localStorage
-  const displayedWeekStart = getItem('displayedWeekStart') || getStartOfWeek(new Date());
-  const startDate = new Date(displayedWeekStart);
-  if (isNaN(startDate)) {
-    console.error('Invalid startDate, using fallback.');
-    startDate = getStartOfWeek(new Date());
-  }
-  
+  // Отримуємо дату початку тижня з localStorage
+  const displayedWeekStart = getItem('displayedWeekStart');
+  if (!displayedWeekStart) return; // Якщо в storage нічого нема, виходимо
 
-  // 2. Генерируем массив из 7 дней недели
+  const startDate = new Date(displayedWeekStart);
+
+  // Генеруємо масив із 7 днів
   const weekDates = generateWeekRange(startDate);
 
-  // 3. Создаем HTML-разметку для заголовка (7 дней недели)
+  // Створюємо HTML для заголовка календаря
   const weekHTML = weekDates.map((date) => {
-    const dayOfWeek = daysOfWeek[date.getDay()]; // Получаем день недели
-    const dayNumber = date.getDate(); // Получаем число месяца
+    const dayOfWeek = daysOfWeek[date.getDay()]; // Назва дня
+    const dayNumber = date.getDate(); // Число місяця
 
     return `
       <div class="calendar__day-label" data-day="${dayNumber}">
@@ -31,13 +29,17 @@ export const renderHeader = () => {
     `;
   }).join('');
 
-  // 4. Вставляем разметку в .calendar__header
-  document.querySelector('.calendar__header').innerHTML = weekHTML;
+  // Вставляємо розмітку у календар
+  const headerElement = document.querySelector('.calendar__header');
+  if (headerElement) {
+    headerElement.innerHTML = weekHTML;
+  }
 
-  // 5. Добавляем обработчик клика на кнопку "Create"
-  document
-    .querySelector('.create-event-btn')
-    .addEventListener('click', openModal);
+  // Додаємо обробник для кнопки "Create"
+  const createEventBtn = document.querySelector('.create-event-btn');
+  if (createEventBtn) {
+    createEventBtn.addEventListener('click', openModal);
+  }
 };
 
   

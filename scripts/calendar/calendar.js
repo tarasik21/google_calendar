@@ -1,5 +1,5 @@
  import { getItem } from '../common/storage.js';
- import { generateWeekRange } from '../common/time.utils.js';
+ import { generateWeekRange  } from '../common/time.utils.js';
  import { renderEvents } from '../events/events.js';
  import { createNumbersArray } from '../common/createNumbersArray.js';
  import { daysOfWeek } from '../calendar/header.js';  // Убедитесь, что путь правильный
@@ -11,67 +11,52 @@
 
 
 // Функция для генерации разметки одного дня
-export const generateDay = () => {
+// Функция для генерации разметки дня с 24 часами
+export const generateDay = (date) => {
   let dayHTML = '';
+  // Цикл по часам с 0 до 23
   for (let hour = 0; hour < 24; hour++) {
-    const hourFormatted = hour.toString().padStart(2, '0') + ':00';
+    const hourFormatted = `${hour.toString().padStart(2, '0')}:00`; // Форматируем время
+    // Формируем HTML-разметку для каждого часа
     dayHTML += `
-      <div class="calendar__time-slot" data-hour="${hour}">
+      <div class="calendar__time-slot" data-hour="${hour}" data-day="${date.getDate()}">
         <span class="calendar__time-slot-time">${hourFormatted}</span>
         <div class="calendar__time-slot-events"></div> 
       </div>
     `;
   }
-  return dayHTML;
+  return dayHTML; // Возвращаем всю разметку
 };
 
 // Функция для рендеринга недели
 export const renderWeek = () => {
-  const weekStartDate = getStartOfWeek(new Date());
-  const weekDays = generateWeekRange(weekStartDate);
+  // 1. Отримуємо дату початку тижня з localStorage
+  const displayedWeekStart = getItem('displayedWeekStart');
+  if (!displayedWeekStart) return;
 
-  let weekHTML = `
-    <thead>
-      <tr>
-        <th></th> <!-- Пустая ячейка для времени -->
-        ${weekDays.map(date => {
-          const dayOfWeek = daysOfWeek[date.getDay()];
-          const dayNumber = date.getDate();
-          return `<th>${dayOfWeek} ${dayNumber}</th>`;
-        }).join('')}
-      </tr>
-    </thead>
-    <tbody>
-  `;
+  const startDate = new Date(displayedWeekStart);
 
-  for (let hour = 0; hour < 24; hour++) {
-    const hourFormatted = `${hour.toString().padStart(2, '0')}:00`;
-    weekHTML += `
-      <tr>
-        <td>${hourFormatted}</td> 
-        ${weekDays.map(date => {
-          return `
-            <td class="calendar__time-slot" data-hour="${hour}" data-day="${date.getDate()}">
-              ${generateDay()}  <!-- Теперь каждый день получает 24 блока -->
-            </td>
-          `;
-        }).join('')}
-      </tr>
+  // 2. Генеруємо 7 днів для тижня
+  const weekDays = generateWeekRange(startDate);
+
+  // 3. Формуємо HTML для кожного дня
+  const weekHTML = weekDays.map((date) => {
+    const dayNumber = date.getDate(); // Отримуємо число місяця
+    return `
+      <div class="calendar__day" data-day="${dayNumber}">
+        ${generateDay(date)} <!-- Вставляємо 24 години для кожного дня -->
+      </div>
     `;
-  }
+  }).join('');
 
-  weekHTML += '</tbody>';
-
+  // 4. Вставляємо розмітку в .calendar__week
   const weekContainer = document.querySelector('.calendar__week');
-  if (!weekContainer) {
-    console.error("Элемент .calendar__week не найден!");
-    return;
+  if (weekContainer) {
+    weekContainer.innerHTML = weekHTML;
   }
 
-  weekContainer.innerHTML = weekHTML;
-
-  console.log("Рендеринг недели выполнен!");
-  renderEvents(); // если у тебя есть функция рендеринга событий
+  // 5. Рендеримо події після вставки HTML
+  renderEvents();
 };
 
 

@@ -1,14 +1,22 @@
 import shmoment from './shmoment.js';
+import { setItem } from './common/storage.js';
 
 // Функція для отримання дати початку тижня (Понеділок)
 export const getStartOfWeek = (date) => {
-  const startOfWeek = new Date(date);
-  const day = startOfWeek.getDay();
-  const diff = day === 0 ? -6 : 1 - day; // Перемещаемся к понедельнику
-  startOfWeek.setDate(startOfWeek.getDate() + diff);
-  startOfWeek.setHours(0, 0, 0, 0);
+  if (!(date instanceof Date) || isNaN(date)) {
+    console.error('Invalid Date passed to getStartOfWeek:', date);
+    return; // Возвращаем undefined, если дата некорректна
+  }
+
+  const day = date.getDay(); // Получаем день недели (0 - воскресенье, 1 - понедельник и так далее)
+  const diff = day === 0 ? -6 : 1 - day; // Если воскресенье (0), то сдвиг на -6, иначе на (1 - день недели)
+  const startOfWeek = new Date(date); // Копируем переданную дату
+  startOfWeek.setDate(date.getDate() + diff); // Сдвигаем дату на количество дней до понедельника
+  startOfWeek.setHours(0, 0, 0, 0); // Устанавливаем время на 00:00 для начала дня
+
   return startOfWeek;
 };
+
 
 
 
@@ -24,9 +32,14 @@ export const generateWeekRange = (startDate) => {
   return result;
 };
 
+
+
+
 // Генерація днів тижня для поточної дати з початком з понеділка
-const weekStartDate = getStartOfWeek(new Date()); // перейменував startDate на weekStartDate
-const weekDays = generateWeekRange(weekStartDate); // Сюда можно добавлять логику генерации дней недели
+const startOfWeek = getStartOfWeek(new Date()); // Например, вычисление начала недели
+setItem('displayedWeekStart', startOfWeek); // Сохранение в localStorage
+
+const weekDays = generateWeekRange(startDate); // Сюда можно добавлять логику генерации дней недели
 
 
 
